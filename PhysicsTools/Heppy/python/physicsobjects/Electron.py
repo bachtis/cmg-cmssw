@@ -25,6 +25,7 @@ class Electron( Lepton ):
         if vertex == None and hasattr(self,'associatedVertex') and self.associatedVertex != None: vertex = self.associatedVertex
         if rho == None and hasattr(self,'rho') and self.rho != None: rho = self.rho
         if   id == "POG_MVA_ID_NonTrig":  return self.mvaIDLoose()
+        elif id == "HZZ_MVA_NonTrig":  return self.mvaIDZZ()
         elif id == "POG_MVA_ID_Trig":     return self.mvaIDTight()
         elif id == "POG_MVA_ID_NonTrig_full5x5":  return self.mvaIDLoose(full5x5=True)
         elif id == "POG_MVA_ID_Trig_full5x5":     return self.mvaIDTight(full5x5=True)
@@ -154,8 +155,17 @@ class Electron( Lepton ):
             else: raise RuntimeError, "Ele MVA ID type not found"   
 
 
-    def mvaIDZZ(self):
-        return self.mvaIDLoose() and (self.gsfTrack().trackerExpectedHitsInner().numberOfLostHits()<=1)
+    def mvaIDZZ(self,full5x5=False):
+        eta = abs(self.superCluster().eta())
+        if self.pt() < 10:
+            if   (eta < 0.8)  : return self.mvaNonTrigV0(full5x5) > -0.202;
+            elif (eta < 1.479): return self.mvaNonTrigV0(full5x5) > -0.444;
+            else              : return self.mvaNonTrigV0(full5x5) > +0.264;
+        else:
+            if   (eta < 0.8)  : return self.mvaNonTrigV0(full5x5) > -0.110;
+            elif (eta < 1.479): return self.mvaNonTrigV0(full5x5) > -0.284;
+            else              : return self.mvaNonTrigV0(full5x5) > -0.212;
+
 
     def chargedHadronIsoR(self,R=0.4):
         if   R == 0.3: return self.physObj.pfIsolationVariables().sumChargedHadronPt 

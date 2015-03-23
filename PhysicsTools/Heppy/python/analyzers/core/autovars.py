@@ -15,8 +15,12 @@ class NTupleVariable:
         self.default = default
         self.mcOnly  = mcOnly
         self.filler  = filler
+        self.subOperators=[]
     def __call__(self,object):
-        ret = self.function(object)
+        obj=object
+        for op in reversed(self.subOperators):
+            obj=op(obj)
+        ret = self.function(obj)
         return ret
     def makeBranch(self,treeNumpy,isMC):
         if self.mcOnly and not isMC: return
@@ -27,12 +31,27 @@ class NTupleVariable:
     def __repr__(self):
         return "<NTupleVariable[%s]>" % self.name
 
+
+
+
 class NTupleObjectType:
     def __init__(self,name,baseObjectTypes=[],mcOnly=[],variables=[]):
         self.name = name
         self.baseObjectTypes = baseObjectTypes
         self.mcOnly = mcOnly
-        self.variables = variables
+        self.variables=[]
+        for v in variables:
+            if issubclass(v.__class__,NTupleSubObjectType):
+                print 'variable with children:',v.name
+                for var in v.objectType.allVars(True):
+                    print 'OLD',var.name,var.subOperators
+                    self.variables.append(NTupleVariable(v.name+"_"+var.name,var.function,var.type,var.help,var.default,var.mcOnly,var.filler))
+#                    self.variables[-1].subOperators = var.subOperators (Mike:This screws up the base classes so one level of subobjects is allowed for now)
+                    self.variables[-1].subOperators.append(v.function)
+                    print 'new',self.variables[-1].name,self.variables[-1].subOperators
+            else:
+                self.variables.append(NTupleVariable(v.name,v.function,v.type,v.help,v.default,v.mcOnly,v.filler))
+
     def ownVars(self,isMC):
         """Return only my vars, not including the ones from the bases"""
         return [ v for v in self.variables if (isMC or not v.mcOnly) ]
@@ -65,6 +84,15 @@ class NTupleObjectType:
     def __repr__(self):
         return "<NTupleObjectType[%s]>" % self.name
 
+
+
+
+class NTupleSubObjectType:
+    def __init__(self,name,function,objectType):
+        self.name = name
+        self.function = function
+        self.objectType = objectType
+
 class NTupleObject:
     def __init__(self, name, objectType, help="", mcOnly=False):
         self.name = name
@@ -85,6 +113,7 @@ class NTupleObject:
             treeNumpy.fill("%s_%s" % (self.name, v.name), v(object))
     def __repr__(self):
         return "<NTupleObject[%s]>" % self.name
+
 
 
 class NTupleCollection:
