@@ -27,7 +27,7 @@ sequence = cfg.Sequence(coreSequence+[leptonTreeProducer])
 
 
 #-------- HOW TO RUN
-test = 1
+test=1
 if test==1:
     # test a single component, using a single thread.
     comp = RSGravToWWToLNQQ_2000

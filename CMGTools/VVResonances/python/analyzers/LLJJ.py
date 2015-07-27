@@ -1,17 +1,17 @@
 from CMGTools.VVResonances.analyzers.EventInterpretationBase import *
 from CMGTools.VVResonances.tools.Pair import Pair
 
-class LNuJJ( EventInterpretationBase ):
+class LLJJ( EventInterpretationBase ):
     def __init__(self, cfg_ana, cfg_comp, looperName):
-        super(LNuJJ,self).__init__(cfg_ana, cfg_comp, looperName)
+        super(LLJJ,self).__init__(cfg_ana, cfg_comp, looperName)
 
     def process(self, event):
-        super(LNuJJ,self).process(event)
+        super(LLJJ,self).process(event)
 
         output=[]
         #read the W
-        for w in event.LNu:
-            leptons = [w.leg1]
+        for w in event.LL:
+            leptons = [w.leg1,w.leg2]
 
             cleanedPackedCandidates = self.removeLeptonFootPrint(leptons,event.packedCandidatesForJets)
 
@@ -36,5 +36,5 @@ class LNuJJ( EventInterpretationBase ):
         if len(output)>0:
             output = sorted(output,key = lambda x: x['pair'].leg2.pt(),reverse=True)
 #            print 'Masses',output[0]['pair'].p4().M(),(output[0]['pair'].leg1.alternateLV+output[0]['pair'].leg2.p4()).M() , 'Delta',abs(output[0]['pair'].leg1.pz()+output[0]['pair'].leg2.pz()),abs(output[0]['pair'].leg1.alternateLV.pz()+output[0]['pair'].leg2.pz())
-        setattr(event,'LNuJJ'+self.cfg_ana.suffix,output)
+        setattr(event,'LLJJ'+self.cfg_ana.suffix,output)
         return True

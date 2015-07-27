@@ -3,6 +3,9 @@ from PhysicsTools.Heppy.analyzers.core.all import *
 from PhysicsTools.Heppy.analyzers.objects.all import *
 from PhysicsTools.Heppy.analyzers.gen.all import *
 from CMGTools.VVResonances.analyzers.LNuJJ import *
+from CMGTools.VVResonances.analyzers.LLJJ import *
+from CMGTools.VVResonances.analyzers.JJ import *
+from CMGTools.VVResonances.analyzers.PackedCandidateLoader import *
 from CMGTools.VVResonances.analyzers.LeptonicVMaker import *
 from CMGTools.VVResonances.analyzers.Skimmer import *
 import os
@@ -195,7 +198,6 @@ tauAna = cfg.Analyzer(
 
 
 
-
 metAna = cfg.Analyzer(
     METAnalyzer, name="metAnalyzer",
     metCollection     = "slimmedMETs",
@@ -218,11 +220,17 @@ metAna = cfg.Analyzer(
 
 leptonicVAna = cfg.Analyzer(
     LeptonicVMaker,
-    name='laptonicVMaker',
+    name='leptonicVMaker',
     zMassLimits = [40.,160.],
-    wMTLimits = [0.,300.]
+    wMTLimits = [0.,600.]
     )
 
+
+packedAna = cfg.Analyzer(
+    PackedCandidateLoader,
+    name = 'PackedCandidateLoader'
+
+)
 
 
 
@@ -236,10 +244,47 @@ lnuJJAna = cfg.Analyzer(
     prunning=False,
     softdrop = True,
     selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
+    doCHS = True,
     ktPower=-1.0,
     r = 0.4,
     selectPair = (lambda x: x.mass()>800.0 ),
+    suffix = '',
+    )
+
+
+llJJAna = cfg.Analyzer(
+    LLJJ,
+    name='LLJJMaker',
+    ktPowerFat = -1.0,
+    rFat = 0.8,
+    massdrop=True,
+    subjets=2,
+    prunning=False,
+    softdrop = True,
+    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
     doCHS = True,
+    ktPower=-1.0,
+    r = 0.4,
+    selectPair = (lambda x: x.mass()>800.0 ),
+    suffix = '',
+    )
+
+
+
+jjAna = cfg.Analyzer(
+    JJ,
+    name='JJMaker',
+    ktPowerFat = -1.0,
+    rFat = 0.8,
+    massdrop=True,
+    subjets=2,
+    doCHS = True,
+    prunning=False,
+    softdrop = True,
+    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
+    ktPower=-1.0,
+    r = 0.4,
+    selectPair = (lambda x: x.mass()>800.0 ),
     suffix = '',
     )
 
@@ -260,7 +305,10 @@ coreSequence = [
     leptonicVAna,
     tauAna,
     triggerFlagsAna,
+    packedAna,
     lnuJJAna,
+    jjAna,
+    llJJAna,
     eventFlagsAna
     
 ]

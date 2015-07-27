@@ -28,7 +28,8 @@ class EventInterpretationBase( Analyzer ):
         toRemove=[]
         for lepton in leptons:
             for p in range(0,lepton.numberOfSourceCandidatePtrs()):
-                toRemove.append(cands[lepton.sourceCandidatePtr(p).key()])
+                index = lepton.sourceCandidatePtr(p).key()
+                toRemove.append(cands[index])
         return list(set(cands)-set(toRemove))
 
 
@@ -87,8 +88,7 @@ class EventInterpretationBase( Analyzer ):
 
     def process(self, event):
         self.readCollections( event.input )
-        #read the packed candidates
-        event.packedCandidatesForJets = self.handles['packed'].product()
+
             
 
         
