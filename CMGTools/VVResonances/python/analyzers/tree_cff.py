@@ -6,7 +6,7 @@ import PhysicsTools.HeppyCore.framework.config as cfg
 vvSkimmer = cfg.Analyzer(
     Skimmer,
     name='vvSkimmer',
-    required = ['LNuJJ']
+    required = ['LNuJJ','JJ','LLJJ']
 )
 
 
@@ -26,8 +26,9 @@ vvTreeProducer = cfg.Analyzer(
      collections = {
 #            "genleps"          : NTupleCollection("gen",     genParticleWithLinksType, 10, help="Generated leptons (e/mu) from W/Z decays"),                                                                                                
 #            "inclusiveLeptons" : NTupleCollection("l",    leptonTypeExtra, 10, help="Inclusive Leptons"),                                                                                                
-            "LNuJJ" : NTupleCollection("lnujj",LNuJJType ,5, help="VV candidate with a lepton neutrino and a fat jet")                                                                                                
-#            "LNuJJCA" : NTupleCollection("lnujjca",LNuJJType ,5, help="VV candidate with a lepton neutrino and a fat jet"),                                                                                                
+        "LNuJJ" : NTupleCollection("lnujj",LNuJJType ,5, help="VV candidate with a lepton neutrino and a fat jet"),                                                   
+        "JJ" : NTupleCollection("jj",JJType ,5, help="VV candidate with two fat jets"),                                       
+        "LLJJ" : NTupleCollection("lljj",LLJJType ,5, help="VV candidate with two leptons and a fat jet")                                       
 #            "genVBosons" : NTupleCollection("genV",     genParticleWithLinksType, 10, help="Generated V bosons"),                                                                                                
      }
 )
