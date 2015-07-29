@@ -18,7 +18,17 @@ LLType = NTupleObjectType("LLType", baseObjectTypes=[fourVectorType], variables 
 
 JetType = NTupleObjectType("SubJetType", baseObjectTypes=[fourVectorType], variables = [
     NTupleVariable("area",   lambda x : x.jetArea(), float),       
-    NTupleVariable("nConstituents",   lambda x : len(x.constituents), int)           
+    NTupleVariable("rawFactor",   lambda x : x.rawFactor(), float),       
+    NTupleVariable("nConstituents",   lambda x : len(x.constituents), int),           
+    NTupleVariable("chargedHadronEnergyFraction",   lambda x : x.chargedHadronEnergyFraction(), float),       
+    NTupleVariable("neutralHadronEnergyFraction",   lambda x : x.neutralHadronEnergyFraction(), float),       
+    NTupleVariable("photonEnergyFraction",   lambda x : x.photonEnergyFraction(), float),       
+    NTupleVariable("HFHadronEnergyFraction",   lambda x : x.HFHadronEnergyFraction(), float),       
+    NTupleVariable("HFEMEnergyFraction",   lambda x : x.HFEMEnergyFraction(), float),       
+    NTupleVariable("muonEnergyFraction",   lambda x : x.muonEnergyFraction(), float),       
+    NTupleVariable("electronEnergyFraction",   lambda x : x.electronEnergyFraction(), float),       
+    NTupleVariable("leptonEnergyFraction",   lambda x : x.leptonEnergyFraction(), float),       
+
 ])
 
 

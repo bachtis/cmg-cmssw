@@ -98,10 +98,17 @@ leptonTypeExtra = NTupleObjectType("leptonExtra", baseObjectTypes = [ leptonType
     # Extra electron ID variables
     NTupleVariable("sigmaIEtaIEta",  lambda x : x.full5x5_sigmaIetaIeta() if abs(x.pdgId())==11 else 0, help="Electron sigma(ieta ieta), with full5x5 cluster shapes"),
     NTupleVariable("dEtaScTrkIn",    lambda x : x.deltaEtaSuperClusterTrackAtVtx() if abs(x.pdgId())==11 else 0, help="Electron deltaEtaSuperClusterTrackAtVtx (without absolute value!)"),
+    NTupleVariable("dEtaSeedTrkIn",    lambda x : x.deltaEtaSeedClusterTrackAtVtx() if abs(x.pdgId())==11 else 0, help="Electron deltaEtaSuperClusterTrackAtVtx (without absolute value!)"),
     NTupleVariable("dPhiScTrkIn",    lambda x : x.deltaPhiSuperClusterTrackAtVtx() if abs(x.pdgId())==11 else 0, help="Electron deltaPhiSuperClusterTrackAtVtx (without absolute value!)"),
     NTupleVariable("hadronicOverEm", lambda x : x.hadronicOverEm() if abs(x.pdgId())==11 else 0, help="Electron hadronicOverEm"),
+    NTupleVariable("hadronicOverEmDepth1", lambda x : x.hcalDepth1OverEcal() if abs(x.pdgId())==11 else 0, help="Electron hadronicOverEm with hadronic calculated only in depth 1"),
     NTupleVariable("eInvMinusPInv",  lambda x : ((1.0/x.ecalEnergy() - x.eSuperClusterOverP()/x.ecalEnergy()) if x.ecalEnergy()>0. else 9e9) if abs(x.pdgId())==11 else 0, help="Electron 1/E - 1/p  (without absolute value!)"),
     NTupleVariable("etaSc", lambda x : x.superCluster().eta() if abs(x.pdgId())==11 else -100, help="Electron supercluster pseudorapidity"),
+    NTupleVariable("ecalDriven", lambda x : x.ecalDriven() if abs(x.pdgId())==11 else -100, help="ecal Driven"),
+    NTupleVariable("e1x5", lambda x : x.e1x5() if abs(x.pdgId())==11 else -1, help="Energy in the 1x5 region"),
+    NTupleVariable("e2x5", lambda x : x.e2x5Max() if abs(x.pdgId())==11 else -1, help="Energy in the max 2x5 region"),
+    NTupleVariable("e5x5", lambda x : x.e5x5Max() if abs(x.pdgId())==11 else -1, help="Energy in the  5x5 region"),
+
 ])
  
 
