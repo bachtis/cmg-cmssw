@@ -5,6 +5,7 @@ from PhysicsTools.Heppy.analyzers.gen.all import *
 from CMGTools.VVResonances.analyzers.LNuJJ import *
 from CMGTools.VVResonances.analyzers.LLJJ import *
 from CMGTools.VVResonances.analyzers.JJ import *
+from CMGTools.VVResonances.analyzers.MultiFinalState  import *
 from CMGTools.VVResonances.analyzers.PackedCandidateLoader import *
 from CMGTools.VVResonances.analyzers.LeptonicVMaker import *
 from CMGTools.VVResonances.analyzers.Skimmer import *
@@ -130,7 +131,7 @@ lepAna = cfg.Analyzer(
     loose_muon_eta    = 2.4,
     loose_muon_dxy    = 0.05,
     loose_muon_dz     = 0.2,
-    loose_muon_relIso = 10.0,
+    loose_muon_relIso = 1.0,
     # inclusive very loose electron selection
     inclusive_electron_id  = "",
     inclusive_electron_pt  = 20.0,
@@ -144,7 +145,7 @@ lepAna = cfg.Analyzer(
     loose_electron_eta    = 2.5,
     loose_electron_dxy    = 0.05,
     loose_electron_dz     = 0.1,
-    loose_electron_relIso = 10.0,
+    loose_electron_relIso = 1.0,
     loose_electron_lostHits = 1.0,
     # muon isolation correction method (can be "rhoArea" or "deltaBeta")
     mu_isoCorr = "deltaBeta",
@@ -221,7 +222,7 @@ metAna = cfg.Analyzer(
 leptonicVAna = cfg.Analyzer(
     LeptonicVMaker,
     name='leptonicVMaker',
-    zMassLimits = [40.,160.],
+    zMassLimits = [70.,140.],
     wMTLimits = [0.,600.]
     )
 
@@ -249,6 +250,14 @@ lnuJJAna = cfg.Analyzer(
     r = 0.4,
     selectPair = (lambda x: x.mass()>800.0 ),
     suffix = '',
+    recalibrateJets = True, # True, False, 'MC', 'Data'
+    recalibrationType = "AK4PFchs",
+    mcGT       = "Summer15_V5_MC",
+    dataGT     = "Summer15_V5_MC",
+    jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
+    shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
+    rho = ('fixedGridRhoFastjetAll','',''),
+
     )
 
 
@@ -267,6 +276,16 @@ llJJAna = cfg.Analyzer(
     r = 0.4,
     selectPair = (lambda x: x.mass()>800.0 ),
     suffix = '',
+
+
+    recalibrateJets = True, # True, False, 'MC', 'Data'
+    recalibrationType = "AK4PFchs",
+    mcGT       = "Summer15_V5_MC",
+    dataGT     = "Summer15_V5_MC",
+    jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
+    shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
+    rho = ('fixedGridRhoFastjetAll','',''),
+
     )
 
 
@@ -286,6 +305,41 @@ jjAna = cfg.Analyzer(
     r = 0.4,
     selectPair = (lambda x: x.mass()>800.0 ),
     suffix = '',
+
+
+    recalibrateJets = True, # True, False, 'MC', 'Data'
+    recalibrationType = "AK4PFchs",
+    mcGT       = "Summer15_V5_MC",
+    dataGT     = "Summer15_V5_MC",
+    jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
+    shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
+    rho = ('fixedGridRhoFastjetAll','',''),
+
+    )
+
+
+multiStateAna = cfg.Analyzer(
+    MultiFinalState,
+    name='MultiFinalStateMaker',
+    ktPowerFat = -1.0,
+    rFat = 0.8,
+    massdrop=True,
+    subjets=2,
+    doCHS = True,
+    prunning=False,
+    softdrop = True,
+    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
+    ktPower=-1.0,
+    r = 0.4,
+    selectPair = (lambda x: x.mass()>800.0 ),
+    suffix = '',
+    recalibrateJets = True, # True, False, 'MC', 'Data'
+    recalibrationType = "AK4PFchs",
+    mcGT       = "Summer15_V5_MC",
+    dataGT     = "Summer15_V5_MC",
+    jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
+    shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
+    rho = ('fixedGridRhoFastjetAll','',''),
     )
 
 
@@ -306,9 +360,10 @@ coreSequence = [
     tauAna,
     triggerFlagsAna,
     packedAna,
-    lnuJJAna,
-    jjAna,
-    llJJAna,
+#    lnuJJAna,
+#    jjAna,
+#    llJJAna,
+    multiStateAna,
     eventFlagsAna
     
 ]

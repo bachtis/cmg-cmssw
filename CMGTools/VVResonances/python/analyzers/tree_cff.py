@@ -22,7 +22,10 @@ vvTreeProducer = cfg.Analyzer(
         NTupleVariable("nLL",lambda ev: len(ev.LL) , int),       
         NTupleVariable("nLNu",lambda ev: len(ev.LNu) , int),       
      ],
-#     globalObjects = susyMultilepton_globalObjects,
+     globalObjects =  {
+            "met" : NTupleObject("met", metType, help="PF E_{T}^{miss}, after type 1 corrections"),
+     },
+
      collections = {
 #            "genleps"          : NTupleCollection("gen",     genParticleWithLinksType, 10, help="Generated leptons (e/mu) from W/Z decays"),                                                                                                
 #            "inclusiveLeptons" : NTupleCollection("l",    leptonTypeExtra, 10, help="Inclusive Leptons"),                                                                                                

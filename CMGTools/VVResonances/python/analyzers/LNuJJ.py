@@ -17,7 +17,6 @@ class LNuJJ( EventInterpretationBase ):
 
             if self.cfg_ana.doCHS:
                 cleanedPackedCandidates = filter(lambda x: x.fromPV(0) ,cleanedPackedCandidates)
-
             #apply selections
             selectedFatJets = self.makeFatJets(cleanedPackedCandidates)
             if self.isMC:
