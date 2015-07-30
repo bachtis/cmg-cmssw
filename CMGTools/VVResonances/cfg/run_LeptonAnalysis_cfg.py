@@ -16,7 +16,8 @@ from CMGTools.VVResonances.analyzers.core_cff import *
 #-------- SAMPLES AND TRIGGERS -----------
 from CMGTools.VVResonances.samples.samples_13TeV_Spring15 import * 
 
-selectedComponents = mcSamples
+#selectedComponents = WJetsToLNuHT+QCDPt
+selectedComponents = QCDPt
 
 #-------- Analyzer
 from CMGTools.VVResonances.analyzers.tree_cff import * 
@@ -36,11 +37,11 @@ coreSequence = [
 ]
 
 
-sequence = cfg.Sequence(coreSequence+[leptonTreeProducer])
+sequence = cfg.Sequence(coreSequence+[leptonSkimmer,leptonTreeProducer])
 
 
 #-------- HOW TO RUN
-test = 1
+test = 0
 if test==1:
     # test a single component, using a single thread.
     comp = RSGravToWWToLNQQ_2000

@@ -9,6 +9,12 @@ vvSkimmer = cfg.Analyzer(
     required = ['LNuJJ','JJ','LLJJ']
 )
 
+leptonSkimmer = cfg.Analyzer(
+    Skimmer,
+    name='leptonSkimmer',
+    required = ['inclusiveLeptons']
+)
+
 
 vvTreeProducer = cfg.Analyzer(
      AutoFillTreeProducer, name='vvTreeProducer',
