@@ -9,6 +9,7 @@ from CMGTools.VVResonances.analyzers.MultiFinalState  import *
 from CMGTools.VVResonances.analyzers.PackedCandidateLoader import *
 from CMGTools.VVResonances.analyzers.LeptonicVMaker import *
 from CMGTools.VVResonances.analyzers.Skimmer import *
+from CMGTools.VVResonances.tools.leptonID  import muonID,electronID
 import os
 
 
@@ -120,32 +121,32 @@ lepAna = cfg.Analyzer(
     doSegmentBasedMuonCleaning=False,
     # inclusive very loose muon selection
     inclusive_muon_id  = "",
-    inclusive_muon_pt  = 15.0,
+    inclusive_muon_pt  = 35.0,
     inclusive_muon_eta = 2.4,
-    inclusive_muon_dxy = 0.5,
-    inclusive_muon_dz  = 1.0,
+    inclusive_muon_dxy = 0.05,
+    inclusive_muon_dz  = 0.2,
     muon_dxydz_track = "innerTrack",
     # loose muon selection
-    loose_muon_id     = "POG_ID_Loose",
-    loose_muon_pt     = 15.0,
+    loose_muon_id     = "",
+    loose_muon_pt     = 35.0,
     loose_muon_eta    = 2.4,
     loose_muon_dxy    = 0.05,
     loose_muon_dz     = 0.2,
-    loose_muon_relIso = 1.0,
+    loose_muon_isoCut = muonID,
     # inclusive very loose electron selection
     inclusive_electron_id  = "",
-    inclusive_electron_pt  = 20.0,
+    inclusive_electron_pt  = 35.0,
     inclusive_electron_eta = 2.5,
-    inclusive_electron_dxy = 0.5,
-    inclusive_electron_dz  = 1.0,
+    inclusive_electron_dxy = 0.05,
+    inclusive_electron_dz  = 0.2,
     inclusive_electron_lostHits = 1.0,
     # loose electron selection
-    loose_electron_id     = "POG_Cuts_ID_2012_Veto_full5x5",
-    loose_electron_pt     = 20.0,
+    loose_electron_id     = "",
+    loose_electron_pt     = 35.0,
     loose_electron_eta    = 2.5,
     loose_electron_dxy    = 0.05,
-    loose_electron_dz     = 0.1,
-    loose_electron_relIso = 1.0,
+    loose_electron_dz     = 0.2,
+    loose_electron_isoCut = electronID,
     loose_electron_lostHits = 1.0,
     # muon isolation correction method (can be "rhoArea" or "deltaBeta")
     mu_isoCorr = "deltaBeta",
