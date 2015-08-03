@@ -43,6 +43,12 @@ triggers_1e      = [ "HLT_Ele32_eta2p1_WP75_Gsf_v*", "HLT_Ele32_eta2p1_WPLoose_G
 
 ### GP: did not look at anything below this
 
+
+###Mike adding here some EXO di-jet stuff
+triggers_HT = ["HLT_PFHT800_v*","HLT_PFHT900_v*"]
+triggers_dijet_fat = ["HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v*","HLT_PFHT650_WideJetMJJ950DEtaJJ1p5_v*"]
+
+
 ### ----> for the MT2 analysis
 
 triggers_HT900 = ["HLT_PFHT900_v*"]
@@ -55,3 +61,5 @@ triggers_MT2_mumu = triggers_mumu_iso
 triggers_MT2_ee   = triggers_ee
 
 triggers_MT2_mue = triggers_mue
+
+

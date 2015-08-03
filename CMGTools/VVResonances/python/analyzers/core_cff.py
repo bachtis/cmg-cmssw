@@ -234,91 +234,6 @@ packedAna = cfg.Analyzer(
 
 )
 
-
-
-lnuJJAna = cfg.Analyzer(
-    LNuJJ,
-    name='LNuJJMaker',
-    ktPowerFat = -1.0,
-    rFat = 0.8,
-    massdrop=True,
-    subjets=2,
-    prunning=False,
-    softdrop = True,
-    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
-    doCHS = True,
-    ktPower=-1.0,
-    r = 0.4,
-    selectPair = (lambda x: x.mass()>800.0 ),
-    suffix = '',
-    recalibrateJets = True, # True, False, 'MC', 'Data'
-    recalibrationType = "AK4PFchs",
-    mcGT       = "Summer15_V5_MC",
-    dataGT     = "Summer15_V5_MC",
-    jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
-    shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
-    rho = ('fixedGridRhoFastjetAll','',''),
-
-    )
-
-
-llJJAna = cfg.Analyzer(
-    LLJJ,
-    name='LLJJMaker',
-    ktPowerFat = -1.0,
-    rFat = 0.8,
-    massdrop=True,
-    subjets=2,
-    prunning=False,
-    softdrop = True,
-    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
-    doCHS = True,
-    ktPower=-1.0,
-    r = 0.4,
-    selectPair = (lambda x: x.mass()>800.0 ),
-    suffix = '',
-
-
-    recalibrateJets = True, # True, False, 'MC', 'Data'
-    recalibrationType = "AK4PFchs",
-    mcGT       = "Summer15_V5_MC",
-    dataGT     = "Summer15_V5_MC",
-    jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
-    shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
-    rho = ('fixedGridRhoFastjetAll','',''),
-
-    )
-
-
-
-jjAna = cfg.Analyzer(
-    JJ,
-    name='JJMaker',
-    ktPowerFat = -1.0,
-    rFat = 0.8,
-    massdrop=True,
-    subjets=2,
-    doCHS = True,
-    prunning=False,
-    softdrop = True,
-    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
-    ktPower=-1.0,
-    r = 0.4,
-    selectPair = (lambda x: x.mass()>800.0 ),
-    suffix = '',
-
-
-    recalibrateJets = True, # True, False, 'MC', 'Data'
-    recalibrationType = "AK4PFchs",
-    mcGT       = "Summer15_V5_MC",
-    dataGT     = "Summer15_V5_MC",
-    jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
-    shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
-    rho = ('fixedGridRhoFastjetAll','',''),
-
-    )
-
-
 multiStateAna = cfg.Analyzer(
     MultiFinalState,
     name='MultiFinalStateMaker',
@@ -332,7 +247,7 @@ multiStateAna = cfg.Analyzer(
     selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
     ktPower=-1.0,
     r = 0.4,
-    selectPair = (lambda x: x.mass()>800.0 ),
+    selectPair = (lambda x: x.mass()>200.0 ),
     suffix = '',
     recalibrateJets = True, # True, False, 'MC', 'Data'
     recalibrationType = "AK4PFchs",
@@ -341,6 +256,10 @@ multiStateAna = cfg.Analyzer(
     jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
     shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
     rho = ('fixedGridRhoFastjetAll','',''),
+    attachBTag = True,
+    btagDiscriminator = "pfCombinedInclusiveSecondaryVertexV2BJetTags",
+    standardJets = 'slimmedJets',
+    subJets = 'slimmedJetsAK8PFCHSSoftDropPacked'
     )
 
 
@@ -361,9 +280,6 @@ coreSequence = [
     tauAna,
     triggerFlagsAna,
     packedAna,
-#    lnuJJAna,
-#    jjAna,
-#    llJJAna,
     multiStateAna,
     eventFlagsAna
     

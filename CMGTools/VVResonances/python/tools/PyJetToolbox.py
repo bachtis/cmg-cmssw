@@ -16,6 +16,7 @@ class PyJet(object):
         self.hfHADEnergy = 0.0
         self.muonEnergy = 0.0
         self.electronEnergy = 0.0
+        self.btag=0.0
 
     def chargedHadronEnergyFraction(self):
         return self.chargedHadronEnergy/(self.LV.energy()*self.rawF)
@@ -44,6 +45,9 @@ class PyJet(object):
 
     def setConstituents(self,constituents):
         self.constituents = constituents
+
+    def bTag(self):
+        return self.btag
         
 
     def p4(self):

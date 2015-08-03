@@ -14,7 +14,7 @@ from PhysicsTools.HeppyCore.framework.heppy import getHeppyOption
 from CMGTools.VVResonances.analyzers.core_cff import * 
 
 #-------- SAMPLES AND TRIGGERS -----------
-from CMGTools.VVResonances.samples.samples_13TeV_Spring15 import * 
+from CMGTools.VVResonances.samples.loadSamples import mcSamples 
 
 selectedComponents = mcSamples
 
@@ -27,13 +27,13 @@ sequence = cfg.Sequence(coreSequence+[vvSkimmer,vvTreeProducer])
 
 
 #-------- HOW TO RUN
-test = 1
+test = 0
 if test==1:
     # test a single component, using a single thread.
-    comp = RSGravToWW_2000
-    comp.files = comp.files[:1]
-    selectedComponents = [comp]
-    comp.splitFactor = 1
+    selectedComponents = filter(lambda x: x.name == 'RSGravToWW_kMpl01_2000',selectedComponents) 
+    for c in selectedComponents:
+        c.files = c.files[:1]
+        c.splitFactor = 1
 
 elif test==2:    
     # test all components (1 thread per component).

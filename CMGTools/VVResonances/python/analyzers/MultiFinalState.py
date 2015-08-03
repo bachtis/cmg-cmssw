@@ -40,7 +40,7 @@ class MultiFinalState( EventInterpretationBase ):
                     remainingCands =self.removeJetFootPrint([jet],cleanedPackedCandidates)
                     selected['satelliteJets']=self.makeSatelliteJets(remainingCands)
                     #add VBF info
-                    self.vbfTopology(selected)
+                    self.topology(selected)
                     LLJJ.append(selected)                   
                     finished=True
                     break;
@@ -56,7 +56,7 @@ class MultiFinalState( EventInterpretationBase ):
                     remainingCands =self.removeJetFootPrint([jet],cleanedPackedCandidates)
                     selected['satelliteJets']=self.makeSatelliteJets(remainingCands)
                     #add VBF info
-                    self.vbfTopology(selected)
+                    self.topology(selected)
                     LNuJJ.append(selected)                   
                     finished=True
                     break;
@@ -82,7 +82,7 @@ class MultiFinalState( EventInterpretationBase ):
                 remainingCands =self.removeJetFootPrint([jet1,jet2],cleanedPackedCandidates)
                 selected['satelliteJets']=self.makeSatelliteJets(remainingCands)
                 #add VBF info
-                self.vbfTopology(selected)
+                self.topology(selected)
                 JJ.append(selected)                   
                 finished=True
                 
