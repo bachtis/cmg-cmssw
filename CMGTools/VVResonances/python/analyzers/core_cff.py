@@ -14,10 +14,17 @@ import os
 
 
 
+
+
 # Pick individual events (normally not in the path)
 eventSelector = cfg.Analyzer(
     EventSelector,name="EventSelector",
     toSelect = []  # here put the event numbers (actual event numbers from CMSSW)
+    )
+
+skimAnalyzer = cfg.Analyzer(
+    SkimAnalyzerCount, name='skimAnalyzerCount',
+    useLumiBlocks = False,
     )
 
 # Apply json file (if the dataset has one)
@@ -36,7 +43,6 @@ triggerFlagsAna = cfg.Analyzer(
     TriggerBitAnalyzer, name="TriggerFlags",
     processName = 'HLT',
     triggerBits = {
-        # "<name>" : [ 'HLT_<Something>_v*', 'HLT_<SomethingElse>_v*' ] 
     }
     )
 
@@ -123,28 +129,28 @@ lepAna = cfg.Analyzer(
     inclusive_muon_id  = "",
     inclusive_muon_pt  = 35.0,
     inclusive_muon_eta = 2.4,
-    inclusive_muon_dxy = 0.05,
+    inclusive_muon_dxy = 0.2,
     inclusive_muon_dz  = 0.2,
     muon_dxydz_track = "innerTrack",
     # loose muon selection
     loose_muon_id     = "",
     loose_muon_pt     = 35.0,
     loose_muon_eta    = 2.4,
-    loose_muon_dxy    = 0.05,
+    loose_muon_dxy    = 0.02,
     loose_muon_dz     = 0.2,
     loose_muon_isoCut = muonID,
     # inclusive very loose electron selection
     inclusive_electron_id  = "",
     inclusive_electron_pt  = 35.0,
     inclusive_electron_eta = 2.5,
-    inclusive_electron_dxy = 0.05,
+    inclusive_electron_dxy = 0.02,
     inclusive_electron_dz  = 0.2,
     inclusive_electron_lostHits = 1.0,
     # loose electron selection
     loose_electron_id     = "",
     loose_electron_pt     = 35.0,
     loose_electron_eta    = 2.5,
-    loose_electron_dxy    = 0.05,
+    loose_electron_dxy    = 0.02,
     loose_electron_dz     = 0.2,
     loose_electron_isoCut = electronID,
     loose_electron_lostHits = 1.0,
@@ -223,8 +229,8 @@ metAna = cfg.Analyzer(
 leptonicVAna = cfg.Analyzer(
     LeptonicVMaker,
     name='leptonicVMaker',
-    zMassLimits = [70.,140.],
-    wMTLimits = [0.,600.]
+    selectLNuPair=(lambda x: x.pt()>200.0),
+    selectLLPair=(lambda x: x.mass()>70.0 and x.mass()<110.0 and x.pt()>100.0)
     )
 
 
@@ -233,91 +239,6 @@ packedAna = cfg.Analyzer(
     name = 'PackedCandidateLoader'
 
 )
-
-
-
-lnuJJAna = cfg.Analyzer(
-    LNuJJ,
-    name='LNuJJMaker',
-    ktPowerFat = -1.0,
-    rFat = 0.8,
-    massdrop=True,
-    subjets=2,
-    prunning=False,
-    softdrop = True,
-    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
-    doCHS = True,
-    ktPower=-1.0,
-    r = 0.4,
-    selectPair = (lambda x: x.mass()>800.0 ),
-    suffix = '',
-    recalibrateJets = True, # True, False, 'MC', 'Data'
-    recalibrationType = "AK4PFchs",
-    mcGT       = "Summer15_V5_MC",
-    dataGT     = "Summer15_V5_MC",
-    jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
-    shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
-    rho = ('fixedGridRhoFastjetAll','',''),
-
-    )
-
-
-llJJAna = cfg.Analyzer(
-    LLJJ,
-    name='LLJJMaker',
-    ktPowerFat = -1.0,
-    rFat = 0.8,
-    massdrop=True,
-    subjets=2,
-    prunning=False,
-    softdrop = True,
-    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
-    doCHS = True,
-    ktPower=-1.0,
-    r = 0.4,
-    selectPair = (lambda x: x.mass()>800.0 ),
-    suffix = '',
-
-
-    recalibrateJets = True, # True, False, 'MC', 'Data'
-    recalibrationType = "AK4PFchs",
-    mcGT       = "Summer15_V5_MC",
-    dataGT     = "Summer15_V5_MC",
-    jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
-    shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
-    rho = ('fixedGridRhoFastjetAll','',''),
-
-    )
-
-
-
-jjAna = cfg.Analyzer(
-    JJ,
-    name='JJMaker',
-    ktPowerFat = -1.0,
-    rFat = 0.8,
-    massdrop=True,
-    subjets=2,
-    doCHS = True,
-    prunning=False,
-    softdrop = True,
-    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
-    ktPower=-1.0,
-    r = 0.4,
-    selectPair = (lambda x: x.mass()>800.0 ),
-    suffix = '',
-
-
-    recalibrateJets = True, # True, False, 'MC', 'Data'
-    recalibrationType = "AK4PFchs",
-    mcGT       = "Summer15_V5_MC",
-    dataGT     = "Summer15_V5_MC",
-    jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
-    shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
-    rho = ('fixedGridRhoFastjetAll','',''),
-
-    )
-
 
 multiStateAna = cfg.Analyzer(
     MultiFinalState,
@@ -329,18 +250,26 @@ multiStateAna = cfg.Analyzer(
     doCHS = True,
     prunning=False,
     softdrop = True,
-    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
+    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>10.0) ,
     ktPower=-1.0,
     r = 0.4,
-    selectPair = (lambda x: x.mass()>800.0 ),
+    selectPairLL = (lambda x: x.mass()>200.0 and x.deltaPhi()>1.5 ),
+    selectPairLNu = (lambda x: x.mass()>200.0 and x.deltaPhi()>1.5 ),
+    selectPairJJ = (lambda x: x.mass()>1000.0 and x.deltaPhi()>1.5 ),
     suffix = '',
     recalibrateJets = True, # True, False, 'MC', 'Data'
     recalibrationType = "AK4PFchs",
-    mcGT       = "Summer15_V5_MC",
-    dataGT     = "Summer15_V5_MC",
+    mcGT     = "Summer15_V5_p6_MC",
+    dataGT     = "Summer15_V5_p6_MC",
     jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
     shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
     rho = ('fixedGridRhoFastjetAll','',''),
+    attachBTag = True,
+    btagDiscriminator = "pfCombinedInclusiveSecondaryVertexV2BJetTags",
+    standardJets = 'slimmedJets',
+    fatJets = 'slimmedJetsAK8',
+    subJets = 'slimmedJetsAK8PFCHSSoftDropPacked',
+    doSkim = True
     )
 
 
@@ -349,8 +278,9 @@ multiStateAna = cfg.Analyzer(
 
 coreSequence = [
    #eventSelector,
+    skimAnalyzer,
     jsonAna,
-    triggerAna,
+#    triggerAna,
     pileUpAna,
     genAna,
 #    pdfwAna,
@@ -361,10 +291,7 @@ coreSequence = [
     tauAna,
     triggerFlagsAna,
     packedAna,
-#    lnuJJAna,
-#    jjAna,
-#    llJJAna,
-    multiStateAna,
-    eventFlagsAna
+    multiStateAna
+#    eventFlagsAna
     
 ]

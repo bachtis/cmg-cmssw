@@ -16,6 +16,7 @@ class PyJet(object):
         self.hfHADEnergy = 0.0
         self.muonEnergy = 0.0
         self.electronEnergy = 0.0
+        self.btag=0.0
 
     def chargedHadronEnergyFraction(self):
         return self.chargedHadronEnergy/(self.LV.energy()*self.rawF)
@@ -44,6 +45,9 @@ class PyJet(object):
 
     def setConstituents(self,constituents):
         self.constituents = constituents
+
+    def bTag(self):
+        return self.btag
         
 
     def p4(self):
@@ -112,7 +116,7 @@ class PyJetToolbox(object):
         self.doPrunning = activate       
         self.prunning = {'zcut':zcut,'rcutfactor':rcutfactor}
 
-    def setSoftDrop(self,activate,beta=0.0,zcut=0.1,R0=0.4):
+    def setSoftDrop(self,activate,beta=0.0,zcut=0.1,R0=0.8):
         self.doSoftDrop = activate
         self.softdrop = {'beta':beta,'zcut':zcut,'R0':R0}
 
@@ -154,8 +158,8 @@ class PyJetToolbox(object):
                     self.interface.prune(isJet,self.prunning['zcut'],self.prunning['rcutfactor'])
                     jet.prunedJet = self.convert(self.interface.get(isJet),False,isJet)
                 if self.doSoftDrop:
-                    self.interface.softDrop(isJet,self.softdrop['beta'],self.softdrop['zcut'],self.softdrop['R0'])
-                    jet.softDropJet = self.convert(self.interface.get(not isJet),False,isJet)[i]
+                    self.interface.softDrop(True,self.softdrop['beta'],self.softdrop['zcut'],self.softdrop['R0'])
+                    jet.softDropJet = self.convert(self.interface.get(False),False,True)[i]
                 if self.doSubjets:
                     if self.subjets['style'] == 'inc':
                         self.interface.makeSubJets(i,self.subjets['setting'])

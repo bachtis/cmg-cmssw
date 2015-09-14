@@ -15,6 +15,8 @@ class MultiFinalState( EventInterpretationBase ):
         JNu=[]
 
 
+        if self.doSkim and not self.skim(event.selectedLeptons):
+            return False
 
 
         #clean leptons and make jets
@@ -22,7 +24,6 @@ class MultiFinalState( EventInterpretationBase ):
         if self.cfg_ana.doCHS:
             cleanedPackedCandidates = filter(lambda x: x.fromPV(0) ,cleanedPackedCandidates)
           
-        
         selectedFatJets = self.makeFatJets(cleanedPackedCandidates)
         if self.isMC:
             self.matchSubJets(selectedFatJets,event.genwzquarks)
@@ -35,12 +36,12 @@ class MultiFinalState( EventInterpretationBase ):
             bestZ = min(event.LL,key = lambda x: abs(x.M()-91.118))
             for jet in selectedFatJets:
                 VV=Pair(bestZ,jet)
-                if self.selectPair(VV):
+                if self.selectPairLL(VV):
                     selected = {'pair':VV}
                     remainingCands =self.removeJetFootPrint([jet],cleanedPackedCandidates)
                     selected['satelliteJets']=self.makeSatelliteJets(remainingCands)
                     #add VBF info
-                    self.vbfTopology(selected)
+                    self.topology(selected)
                     LLJJ.append(selected)                   
                     finished=True
                     break;
@@ -51,12 +52,12 @@ class MultiFinalState( EventInterpretationBase ):
             bestW = max(event.LNu,key = lambda x: x.leg1.pt())
             for jet in selectedFatJets:
                 VV=Pair(bestW,jet)
-                if self.selectPair(VV):
+                if self.selectPairLNu(VV):
                     selected = {'pair':VV}
                     remainingCands =self.removeJetFootPrint([jet],cleanedPackedCandidates)
                     selected['satelliteJets']=self.makeSatelliteJets(remainingCands)
                     #add VBF info
-                    self.vbfTopology(selected)
+                    self.topology(selected)
                     LNuJJ.append(selected)                   
                     finished=True
                     break;
@@ -68,21 +69,13 @@ class MultiFinalState( EventInterpretationBase ):
 
             jet1 = selectedFatJets[0]
             jet2 = selectedFatJets[1]
-
-
-            
-            if jet1.softDropJet.mass()>jet2.softDropJet.mass():
-                VV=Pair(jet2,jet1)
-            else:
-                VV=Pair(jet1,jet2)
-
-
-            if self.selectPair(VV):
+            VV=Pair(jet1,jet2)
+            if self.selectPairJJ(VV):
                 selected = {'pair':VV}
                 remainingCands =self.removeJetFootPrint([jet1,jet2],cleanedPackedCandidates)
                 selected['satelliteJets']=self.makeSatelliteJets(remainingCands)
                 #add VBF info
-                self.vbfTopology(selected)
+                self.topology(selected)
                 JJ.append(selected)                   
                 finished=True
                 
@@ -95,5 +88,4 @@ class MultiFinalState( EventInterpretationBase ):
         setattr(event,'LNuJJ'+self.cfg_ana.suffix,LNuJJ)
         setattr(event,'JJ'+self.cfg_ana.suffix,JJ)
         setattr(event,'LLJJ'+self.cfg_ana.suffix,LLJJ)
-
 
