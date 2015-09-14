@@ -39,16 +39,22 @@ class EventInterpretationBase( Analyzer ):
         if self.attachBTag:
             self.btagDiscriminator = cfg_ana.btagDiscriminator
             
-
+        if hasattr(cfg_ana,'doSkim'):
+            self.doSkim = cfg_ana.doSkim
+        else:
+            self.doSkim=False
             
             
     def declareHandles(self):
         super(EventInterpretationBase, self).declareHandles()
         self.handles['packed'] = AutoHandle( 'packedPFCandidates', 'std::vector<pat::PackedCandidate>' )
         self.handles['rho'] = AutoHandle( self.cfg_ana.rho, 'double' )
-        if self.attachBTag:
+        if self.attachBTag or self.doSkim:
             self.handles['jets'] = AutoHandle( self.cfg_ana.standardJets, 'std::vector<pat::Jet>' )
+            self.handles['fatjets'] = AutoHandle( self.cfg_ana.fatJets, 'std::vector<pat::Jet>' )
             self.handles['subjets'] = AutoHandle( (self.cfg_ana.subJets,'SubJets'), 'std::vector<pat::Jet>' )
+
+
             
 
     def removeLeptonFootPrint(self,leptons,cands):
@@ -70,6 +76,25 @@ class EventInterpretationBase( Analyzer ):
                         s.matched=1
                         s.mcquark = g
                         break;
+
+    def skim(self,leptons):
+        cleanedJets = []
+        for jet in self.handles['fatjets'].product():
+            overlap=False
+            for lepton in leptons:
+                if deltaR(jet.eta(),jet.phi(),lepton.eta(),lepton.phi())<0.8:
+                    overlap=True
+                    break;
+            if not overlap:    
+                cleanedJets.append(jet)
+        nJets = len(cleanedJets)        
+        nLeptons = len(leptons)
+        if (nLeptons>0 and nJets>0) or nJets>1:
+            return True
+        return False
+                
+                
+
                     
     def makeFatJets(self,cands):
         toolboxFat  = PyJetToolbox(cands)
@@ -83,8 +108,12 @@ class EventInterpretationBase( Analyzer ):
         fatJets=toolboxFat.inclusiveJets(100.0,True)
         filtered = filter(self.selectFat,fatJets)
 
+        standardFatJets = self.handles['fatjets'].product()
+
         if self.attachBTag:
             for fat in filtered:
+                for standardFat in standardFatJets:
+                    fat.btag = standardFat.bDiscriminator(self.btagDiscriminator)
                 for j in fat.subjets:
                     for standard in self.handles['subjets'].product():
                         if deltaR(j.eta(),j.phi(),standard.eta(),standard.phi())<0.1:

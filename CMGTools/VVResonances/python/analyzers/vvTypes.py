@@ -44,7 +44,6 @@ JetType = NTupleObjectType("SubJetType", baseObjectTypes=[fourVectorType], varia
 
 
 FatJetType = NTupleObjectType("FatJetType", baseObjectTypes=[JetType], variables = [
-    NTupleVariable("softDropMass",   lambda x : x.softDropJet.mass(), float),       
     NTupleVariable("tau1",   lambda x : x.Ntau[0], float),       
     NTupleVariable("tau2",   lambda x : x.Ntau[1], float),       
     NTupleVariable("tau3",   lambda x : x.Ntau[2], float),       

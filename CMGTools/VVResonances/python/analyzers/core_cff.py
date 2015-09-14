@@ -13,11 +13,19 @@ from CMGTools.VVResonances.tools.leptonID  import muonID,electronID
 import os
 
 
+from CMGTools.RootTools.samples.triggers_13TeV_Spring15 import triggers_1e,triggers_1mu_iso,triggers_1mu_noniso,triggers_HT,triggers_dijet_fat
+
+
 
 # Pick individual events (normally not in the path)
 eventSelector = cfg.Analyzer(
     EventSelector,name="EventSelector",
     toSelect = []  # here put the event numbers (actual event numbers from CMSSW)
+    )
+
+skimAnalyzer = cfg.Analyzer(
+    SkimAnalyzerCount, name='skimAnalyzerCount',
+    useLumiBlocks = False,
     )
 
 # Apply json file (if the dataset has one)
@@ -36,7 +44,11 @@ triggerFlagsAna = cfg.Analyzer(
     TriggerBitAnalyzer, name="TriggerFlags",
     processName = 'HLT',
     triggerBits = {
-        # "<name>" : [ 'HLT_<Something>_v*', 'HLT_<SomethingElse>_v*' ] 
+         "ISOMU" : triggers_1mu_iso,
+         "MU"  : triggers_1mu_noniso,
+         "ELE" : triggers_1e,
+         "HT" : triggers_HT,
+         "JJ" : triggers_dijet_fat
     }
     )
 
@@ -251,15 +263,17 @@ multiStateAna = cfg.Analyzer(
     suffix = '',
     recalibrateJets = True, # True, False, 'MC', 'Data'
     recalibrationType = "AK4PFchs",
-    mcGT       = "Summer15_V5_MC",
-    dataGT     = "Summer15_V5_MC",
+    mcGT     = "Summer15_V5_p6_MC",
+    dataGT     = "Summer15_V5_p6_MC",
     jecPath = "%s/src/CMGTools/RootTools/data/jec/" % os.environ['CMSSW_BASE'],
     shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
     rho = ('fixedGridRhoFastjetAll','',''),
     attachBTag = True,
     btagDiscriminator = "pfCombinedInclusiveSecondaryVertexV2BJetTags",
     standardJets = 'slimmedJets',
-    subJets = 'slimmedJetsAK8PFCHSSoftDropPacked'
+    fatJets = 'slimmedJetsAK8',
+    subJets = 'slimmedJetsAK8PFCHSSoftDropPacked',
+    doSkim = True
     )
 
 
@@ -268,6 +282,7 @@ multiStateAna = cfg.Analyzer(
 
 coreSequence = [
    #eventSelector,
+    skimAnalyzer,
     jsonAna,
     triggerAna,
     pileUpAna,
@@ -280,7 +295,7 @@ coreSequence = [
     tauAna,
     triggerFlagsAna,
     packedAna,
-    multiStateAna,
-    eventFlagsAna
+    multiStateAna
+#    eventFlagsAna
     
 ]

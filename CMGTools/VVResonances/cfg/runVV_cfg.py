@@ -14,9 +14,10 @@ from PhysicsTools.HeppyCore.framework.heppy import getHeppyOption
 from CMGTools.VVResonances.analyzers.core_cff import * 
 
 #-------- SAMPLES AND TRIGGERS -----------
-from CMGTools.VVResonances.samples.loadSamples import mcSamples 
+from CMGTools.VVResonances.samples.loadSamples import mcSamples,dataSamples,signalSamples
 
-selectedComponents = mcSamples
+#selectedComponents = mcSamples+dataSamples
+selectedComponents = dataSamples
 
 #-------- Analyzer
 from CMGTools.VVResonances.analyzers.tree_cff import * 
@@ -30,16 +31,24 @@ sequence = cfg.Sequence(coreSequence+[vvSkimmer,vvTreeProducer])
 test = 0
 if test==1:
     # test a single component, using a single thread.
-    selectedComponents = filter(lambda x: x.name == 'RSGravToWW_kMpl01_2000',selectedComponents) 
+    selectedComponents = [signalSamples[7]]
     for c in selectedComponents:
         c.files = c.files[:1]
         c.splitFactor = 1
 
 elif test==2:    
     # test all components (1 thread per component).
+    selectedComponents = [dataSamples[0]]
     for comp in selectedComponents:
         comp.splitFactor = 1
-        comp.files = comp.files[:1]
+#        comp.files = comp.files[:1]
+
+elif test==3:
+    # test a single component, using a single thread.
+    selectedComponents = [signalSamples[0]]
+    for c in selectedComponents:
+        c.files = c.files[:1]
+        c.splitFactor = 1
 
 
 
@@ -62,6 +71,7 @@ outputService.append(output_service)
 from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
 from CMGTools.TTHAnalysis.tools.EOSEventsWithDownload import EOSEventsWithDownload
 event_class = EOSEventsWithDownload
+event_class = Events
 if getHeppyOption("nofetch"):
     event_class = Events 
 config = cfg.Config( components = selectedComponents,

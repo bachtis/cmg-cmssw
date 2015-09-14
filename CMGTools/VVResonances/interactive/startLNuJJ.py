@@ -19,11 +19,11 @@ WJets = MergedPlotter(wjPlotters)
 
 WJets.setFillProperties(1001,ROOT.kAzure-9)
 
-RSGWWLNuQQ = TreePlotter('samples/RSGravToWWToLNQQ_2000.root','tree')
-RSGWWLNuQQ.setupFromFile('samples/RSGravToWWToLNQQ_2000.pck')
+RSGWWLNuQQ = TreePlotter('samples/RSGravToWWToLNQQ_kMpl01_2000.root','tree')
+RSGWWLNuQQ.setupFromFile('samples/RSGravToWWToLNQQ_kMpl01_2000.pck')
 RSGWWLNuQQ.setFillProperties(0,ROOT.kWhite)
 RSGWWLNuQQ.setLineProperties(1,ROOT.kOrange+10,3)
-#RSGWWLNuQQ..addCorrectionFactor('xsec',0.001,0.0,'lnN')
+RSGWWLNuQQ.addCorrectionFactor('xsec',0.001,0.0,'lnN')
 
 
 #Stack

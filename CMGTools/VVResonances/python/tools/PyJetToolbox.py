@@ -158,8 +158,8 @@ class PyJetToolbox(object):
                     self.interface.prune(isJet,self.prunning['zcut'],self.prunning['rcutfactor'])
                     jet.prunedJet = self.convert(self.interface.get(isJet),False,isJet)
                 if self.doSoftDrop:
-                    self.interface.softDrop(isJet,self.softdrop['beta'],self.softdrop['zcut'],self.softdrop['R0'])
-                    jet.softDropJet = self.convert(self.interface.get(not isJet),False,isJet)[i]
+                    self.interface.softDrop(True,self.softdrop['beta'],self.softdrop['zcut'],self.softdrop['R0'])
+                    jet.softDropJet = self.convert(self.interface.get(False),False,True)[i]
                 if self.doSubjets:
                     if self.subjets['style'] == 'inc':
                         self.interface.makeSubJets(i,self.subjets['setting'])

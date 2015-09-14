@@ -15,6 +15,8 @@ class MultiFinalState( EventInterpretationBase ):
         JNu=[]
 
 
+        if self.doSkim and not self.skim(event.selectedLeptons):
+            return False
 
 
         #clean leptons and make jets
@@ -68,15 +70,7 @@ class MultiFinalState( EventInterpretationBase ):
 
             jet1 = selectedFatJets[0]
             jet2 = selectedFatJets[1]
-
-
-            
-            if jet1.softDropJet.mass()>jet2.softDropJet.mass():
-                VV=Pair(jet2,jet1)
-            else:
-                VV=Pair(jet1,jet2)
-
-
+            VV=Pair(jet1,jet2)
             if self.selectPair(VV):
                 selected = {'pair':VV}
                 remainingCands =self.removeJetFootPrint([jet1,jet2],cleanedPackedCandidates)
@@ -95,5 +89,4 @@ class MultiFinalState( EventInterpretationBase ):
         setattr(event,'LNuJJ'+self.cfg_ana.suffix,LNuJJ)
         setattr(event,'JJ'+self.cfg_ana.suffix,JJ)
         setattr(event,'LLJJ'+self.cfg_ana.suffix,LLJJ)
-
 
