@@ -13,7 +13,6 @@ from CMGTools.VVResonances.tools.leptonID  import muonID,electronID
 import os
 
 
-from CMGTools.RootTools.samples.triggers_13TeV_Spring15 import triggers_1e,triggers_1mu_iso,triggers_1mu_noniso,triggers_HT,triggers_dijet_fat
 
 
 
@@ -44,11 +43,6 @@ triggerFlagsAna = cfg.Analyzer(
     TriggerBitAnalyzer, name="TriggerFlags",
     processName = 'HLT',
     triggerBits = {
-         "ISOMU" : triggers_1mu_iso,
-         "MU"  : triggers_1mu_noniso,
-         "ELE" : triggers_1e,
-         "HT" : triggers_HT,
-         "JJ" : triggers_dijet_fat
     }
     )
 
@@ -135,28 +129,28 @@ lepAna = cfg.Analyzer(
     inclusive_muon_id  = "",
     inclusive_muon_pt  = 35.0,
     inclusive_muon_eta = 2.4,
-    inclusive_muon_dxy = 0.05,
+    inclusive_muon_dxy = 0.2,
     inclusive_muon_dz  = 0.2,
     muon_dxydz_track = "innerTrack",
     # loose muon selection
     loose_muon_id     = "",
     loose_muon_pt     = 35.0,
     loose_muon_eta    = 2.4,
-    loose_muon_dxy    = 0.05,
+    loose_muon_dxy    = 0.02,
     loose_muon_dz     = 0.2,
     loose_muon_isoCut = muonID,
     # inclusive very loose electron selection
     inclusive_electron_id  = "",
     inclusive_electron_pt  = 35.0,
     inclusive_electron_eta = 2.5,
-    inclusive_electron_dxy = 0.05,
+    inclusive_electron_dxy = 0.02,
     inclusive_electron_dz  = 0.2,
     inclusive_electron_lostHits = 1.0,
     # loose electron selection
     loose_electron_id     = "",
     loose_electron_pt     = 35.0,
     loose_electron_eta    = 2.5,
-    loose_electron_dxy    = 0.05,
+    loose_electron_dxy    = 0.02,
     loose_electron_dz     = 0.2,
     loose_electron_isoCut = electronID,
     loose_electron_lostHits = 1.0,
@@ -235,8 +229,8 @@ metAna = cfg.Analyzer(
 leptonicVAna = cfg.Analyzer(
     LeptonicVMaker,
     name='leptonicVMaker',
-    zMassLimits = [70.,140.],
-    wMTLimits = [0.,600.]
+    selectLNuPair=(lambda x: x.pt()>200.0),
+    selectLLPair=(lambda x: x.mass()>70.0 and x.mass()<110.0 and x.pt()>100.0)
     )
 
 
@@ -256,10 +250,12 @@ multiStateAna = cfg.Analyzer(
     doCHS = True,
     prunning=False,
     softdrop = True,
-    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>20.0),
+    selectFat = (lambda x: x.pt()>100.0 and abs(x.eta())<2.4 and len(x.subjets)==2 and x.softDropJet.mass()>10.0) ,
     ktPower=-1.0,
     r = 0.4,
-    selectPair = (lambda x: x.mass()>200.0 ),
+    selectPairLL = (lambda x: x.mass()>200.0 and x.deltaPhi()>1.5 ),
+    selectPairLNu = (lambda x: x.mass()>200.0 and x.deltaPhi()>1.5 ),
+    selectPairJJ = (lambda x: x.mass()>1000.0 and x.deltaPhi()>1.5 ),
     suffix = '',
     recalibrateJets = True, # True, False, 'MC', 'Data'
     recalibrationType = "AK4PFchs",
@@ -284,7 +280,7 @@ coreSequence = [
    #eventSelector,
     skimAnalyzer,
     jsonAna,
-    triggerAna,
+#    triggerAna,
     pileUpAna,
     genAna,
 #    pdfwAna,

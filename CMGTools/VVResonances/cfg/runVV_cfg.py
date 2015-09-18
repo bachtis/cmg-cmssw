@@ -16,8 +16,8 @@ from CMGTools.VVResonances.analyzers.core_cff import *
 #-------- SAMPLES AND TRIGGERS -----------
 from CMGTools.VVResonances.samples.loadSamples import mcSamples,dataSamples,signalSamples
 
-#selectedComponents = mcSamples+dataSamples
-selectedComponents = dataSamples
+selectedComponents = mcSamples+dataSamples
+#selectedComponents = dataSamples
 
 #-------- Analyzer
 from CMGTools.VVResonances.analyzers.tree_cff import * 
@@ -25,6 +25,21 @@ from CMGTools.VVResonances.analyzers.tree_cff import *
 #-------- SEQUENCE
 
 sequence = cfg.Sequence(coreSequence+[vvSkimmer,vvTreeProducer])
+
+
+from CMGTools.RootTools.samples.triggers_13TeV_Spring15 import *
+
+
+triggerFlagsAna.triggerBits ={
+    "ISOMU":triggers_1mu_iso,
+    "ISOMU_50ns":triggers_1mu_iso_50ns,
+    "MU":triggers_1mu_noniso,
+    "ISOELE":triggers_1e,
+    "ISOELE_50ns":triggers_1e_50ns,
+    "ELE":triggers_1e_noniso,
+    "HT":triggers_HT,
+    "JJ":triggers_dijet_fat  
+}
 
 
 #-------- HOW TO RUN

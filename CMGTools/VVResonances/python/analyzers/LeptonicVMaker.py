@@ -12,9 +12,8 @@ from CMGTools.VVResonances.tools.Pair import *
 class LeptonicVMaker( Analyzer ):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(LeptonicVMaker,self).__init__(cfg_ana, cfg_comp, looperName)
-        self.zMassLimits = cfg_ana.zMassLimits
-        self.wMTLimits   = cfg_ana.wMTLimits
-        
+        self.selectLNuPair = cfg_ana.selectLNuPair
+        self.selectLLPair = cfg_ana.selectLLPair
 
     def declareHandles(self):
         super(LeptonicVMaker, self).declareHandles()
@@ -26,7 +25,7 @@ class LeptonicVMaker( Analyzer ):
             if  (l1.pdgId() == -l2.pdgId()):
                 pair = Pair(l1,l2,23)
                 m=pair.p4().mass()
-                if m>self.zMassLimits[0] and  m<self.zMassLimits[1]:
+                if self.selectLLPair(pair):
 #                    print 'New Z with mass ',m
                     output.append(pair)
         return output            
@@ -79,15 +78,54 @@ class LeptonicVMaker( Analyzer ):
             p2.SetPxPyPzE(metLV2.Px(),metLV2.Py(),metLV2.Pz(),metLV2.Energy())
             pair.LV = pair.leg1.p4()+p2
             p2.SetPxPyPzE(metLV.Px(),metLV.Py(),0.0,math.sqrt(metLV.Px()*metLV.Px()+metLV.Py()*metLV.Py()))
-            
+
+
+
+    def defaultWKinematicFit(self,pair):
+        MW=80.390
+
+        muonLV = ROOT.TLorentzVector(pair.leg1.px(),pair.leg1.py(),pair.leg1.pz(),pair.leg1.energy())
+        metLV = ROOT.TLorentzVector(pair.leg2.px(),pair.leg2.py(),pair.leg2.pz(),pair.leg2.energy())
+
+
+
+        alpha = MW*MW+2*muonLV.Px()*metLV.Px()+2*muonLV.Py()*metLV.Py()
+        A = 4*(muonLV.Energy()*muonLV.Energy()-muonLV.Pz()*muonLV.Pz()) 
+        B = -4* alpha*muonLV.Pz()
+        C = 4*muonLV.Energy()*muonLV.Energy()*(metLV.Px()*metLV.Px()+metLV.Py()*metLV.Py())-alpha*alpha
+        D = B*B-4*A*C
+
+        if D>0:
+            pz1=(-B+math.sqrt(D))/(2*A)
+            pz2=(-B-math.sqrt(D))/(2*A)
+            if abs(pz1)<abs(pz2):
+                pp1 =pair.leg2.p4()
+                pp1.SetPxPyPzE(metLV.Px(),metLV.Py(),pz1,metLV.Energy())
+                pair.LV=pair.leg1.p4()+pp1
+                pp2 =pair.leg2.p4()
+                pp2.SetPxPyPzE(metLV.Px(),metLV.Py(),pz2,metLV.Energy())
+                pair.alternateLV=pair.leg1.p4()+pp2
+            else:    
+                pp1 =pair.leg2.p4()
+                pp1.SetPxPyPzE(metLV.Px(),metLV.Py(),pz2,metLV.Energy())
+                pair.LV=pair.leg1.p4()+pp1
+                pp2 =pair.leg2.p4()
+                pp2.SetPxPyPzE(metLV.Px(),metLV.Py(),pz1,metLV.Energy())
+                pair.alternateLV=pair.leg1.p4()+pp2
+        else:
+            pz=-B/(2*A)
+            pp =pair.leg2.p4()
+            pp.SetPxPyPzE(metLV.Px(),metLV.Py(),pz,metLV.Energy())
+            pair.LV=pair.leg1.p4()+pp
+            pair.alternateLV=pair.LV
 
     def makeLeptonsMET(self,leptonList,MET):
         output=[]
         for l1 in leptonList:
             pair = Pair(l1,MET,l1.charge()*24)
             mt=pair.mt()
-            if mt>self.wMTLimits[0] and  mt<self.wMTLimits[1]:
-                self.simpleWKinematicFit(pair)
+            if self.selectLNuPair(pair):
+                self.defaultWKinematicFit(pair)
                 output.append(pair)
         return output            
 

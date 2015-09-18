@@ -16,7 +16,8 @@ if __name__ == '__main__':
 
 
     for directory in os.listdir(args[0]):
-
+        if directory.find("Chunk")!=-1:
+            continue
     
         #First unpack tyhe counter and get the events
         if os.path.exists(directory+'/'+options.trigcounter):

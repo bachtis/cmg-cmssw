@@ -116,7 +116,7 @@ class PyJetToolbox(object):
         self.doPrunning = activate       
         self.prunning = {'zcut':zcut,'rcutfactor':rcutfactor}
 
-    def setSoftDrop(self,activate,beta=0.0,zcut=0.1,R0=0.4):
+    def setSoftDrop(self,activate,beta=0.0,zcut=0.1,R0=0.8):
         self.doSoftDrop = activate
         self.softdrop = {'beta':beta,'zcut':zcut,'R0':R0}
 

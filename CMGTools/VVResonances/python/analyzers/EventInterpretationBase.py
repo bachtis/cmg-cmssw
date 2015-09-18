@@ -14,7 +14,9 @@ class EventInterpretationBase( Analyzer ):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(EventInterpretationBase,self).__init__(cfg_ana, cfg_comp, looperName)
         self.selectFat = self.cfg_ana.selectFat
-        self.selectPair = self.cfg_ana.selectPair
+        self.selectPairLNu = self.cfg_ana.selectPairLNu
+        self.selectPairLL = self.cfg_ana.selectPairLL
+        self.selectPairJJ = self.cfg_ana.selectPairJJ
         self.isMC =cfg_comp.isMC
         if hasattr(cfg_ana,'matchDR'):
             self.matchDR = cfg_ana.matchDR

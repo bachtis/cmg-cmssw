@@ -24,7 +24,6 @@ class MultiFinalState( EventInterpretationBase ):
         if self.cfg_ana.doCHS:
             cleanedPackedCandidates = filter(lambda x: x.fromPV(0) ,cleanedPackedCandidates)
           
-        
         selectedFatJets = self.makeFatJets(cleanedPackedCandidates)
         if self.isMC:
             self.matchSubJets(selectedFatJets,event.genwzquarks)
@@ -37,7 +36,7 @@ class MultiFinalState( EventInterpretationBase ):
             bestZ = min(event.LL,key = lambda x: abs(x.M()-91.118))
             for jet in selectedFatJets:
                 VV=Pair(bestZ,jet)
-                if self.selectPair(VV):
+                if self.selectPairLL(VV):
                     selected = {'pair':VV}
                     remainingCands =self.removeJetFootPrint([jet],cleanedPackedCandidates)
                     selected['satelliteJets']=self.makeSatelliteJets(remainingCands)
@@ -53,7 +52,7 @@ class MultiFinalState( EventInterpretationBase ):
             bestW = max(event.LNu,key = lambda x: x.leg1.pt())
             for jet in selectedFatJets:
                 VV=Pair(bestW,jet)
-                if self.selectPair(VV):
+                if self.selectPairLNu(VV):
                     selected = {'pair':VV}
                     remainingCands =self.removeJetFootPrint([jet],cleanedPackedCandidates)
                     selected['satelliteJets']=self.makeSatelliteJets(remainingCands)
@@ -71,7 +70,7 @@ class MultiFinalState( EventInterpretationBase ):
             jet1 = selectedFatJets[0]
             jet2 = selectedFatJets[1]
             VV=Pair(jet1,jet2)
-            if self.selectPair(VV):
+            if self.selectPairJJ(VV):
                 selected = {'pair':VV}
                 remainingCands =self.removeJetFootPrint([jet1,jet2],cleanedPackedCandidates)
                 selected['satelliteJets']=self.makeSatelliteJets(remainingCands)
