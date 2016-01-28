@@ -47,7 +47,7 @@ triggerFlagsAna.triggerBits ={
 
 
 #-------- HOW TO RUN
-test = 1
+test = 4
 if test==1:
     # test a single component, using a single thread.
     selectedComponents = [VBF_RadionToZZ_narrow_4500]
@@ -71,6 +71,8 @@ elif test==4:
     selectedComponents = [RSGravToWWToLNQQ_kMpl01_4500]
     for comp in selectedComponents:
         comp.splitFactor = 1
+elif test==5:    
+    selectedComponents = [WJetsToLNu_HT2500toInf]
 
 from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
 event_class = Events

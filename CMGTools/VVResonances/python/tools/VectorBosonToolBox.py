@@ -1,49 +1,22 @@
-import ROOT
-import random
-import math
-from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
-from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
 from PhysicsTools.HeppyCore.utils.deltar import *
 import PhysicsTools.HeppyCore.framework.config as cfg
 from  itertools import combinations
 from CMGTools.VVResonances.tools.Pair import *
 from copy import copy
-
-class LeptonicVMaker( Analyzer ):
-    def __init__(self, cfg_ana, cfg_comp, looperName):
-        super(LeptonicVMaker,self).__init__(cfg_ana, cfg_comp, looperName)
-        self.selectLNuPair = cfg_ana.selectLNuPair
-        self.selectLLPair = cfg_ana.selectLLPair
-
-    def declareHandles(self):
-        super(LeptonicVMaker, self).declareHandles()
+import ROOT
 
 
-    def makeDiLeptons(self,leptonList):
-        output=[]
-        for l1,l2 in combinations(leptonList,2):
-            if  (l1.pdgId() == -l2.pdgId()):
-                pair = Pair(l1,l2,23)
-                if abs(l1.pdgId())==11:                  
-                    self.eeIsolationFootPrint(pair)
-                elif abs(l1.pdgId())==13:                      
-                    self.mumuIsolationFootPrint(pair)
-                m=pair.p4().mass()
-                if self.selectLLPair(pair):
-#                    print 'New Z with mass ',m
-                    output.append(pair)
-        return output            
+class VectorBosonToolBox(object):
 
-
-    def muIsolationFootPrint(self,z):#does nothing / for common interface
-        footPrintLeg1=0.0
-        z.leg1.cleanedChargedIso = max(z.leg1.pfIsolationR04().sumChargedHadronPt,0.0)                    
-        z.leg1.cleanedNeutralIsoDB=max( z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-z.leg1.puChargedHadronIsoR(0.4)/2, 0.0)
-        z.leg1.cleanedNeutralIsoRho=max(z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-z.leg1.rho*z.leg1.EffectiveArea04,0)        
+    def WMuNuPFIsolation(self,z):#does nothing / for common interface
+       footPrintLeg1=0.0
+       cleanedChargedIso = max(z.leg1.pfIsolationR04().sumChargedHadronPt,0.0)                    
+       cleanedNeutralIsoDB=max( z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-z.leg1.puChargedHadronIsoR(0.4)/2, 0.0)
+       return (cleanedChargedIso+cleanedNeutralIsoDB)/z.leg1.pt()<0.2
 
 
 
-    def mumuIsolationFootPrint(self,z):
+    def ZMuMuPFIsolation(self,z):
         footPrintLeg1=0.0
         footPrintLeg2=0.0
         dr=deltaR(z.leg1.eta(),z.leg1.phi(),z.leg2.eta(),z.leg2.phi())
@@ -52,21 +25,20 @@ class LeptonicVMaker( Analyzer ):
         if dr<0.4 and not z.leg1.isPFMuon():
             footPrintLeg2=z.leg2.pt()
 
-        z.leg1.cleanedChargedIso = max(z.leg1.pfIsolationR04().sumChargedHadronPt-footPrintLeg1,0.0)                    
-        z.leg2.cleanedChargedIso = max(z.leg2.pfIsolationR04().sumChargedHadronPt-footPrintLeg2,0.0)                    
-        z.leg1.cleanedNeutralIsoDB=max( z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-z.leg1.puChargedHadronIsoR(0.4)/2, 0.0)
-        z.leg1.cleanedNeutralIsoRho=max(z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-z.leg1.rho*z.leg1.EffectiveArea04,0)        
-        z.leg2.cleanedNeutralIsoDB=max( z.leg2.neutralHadronIsoR(0.4)+z.leg2.photonIsoR(0.4)-z.leg2.puChargedHadronIsoR(0.4)/2, 0.0)
-        z.leg2.cleanedNeutralIsoRho=max(z.leg2.neutralHadronIsoR(0.4)+z.leg2.photonIsoR(0.4)-z.leg2.rho*z.leg2.EffectiveArea04,0)        
+        cleanedChargedIso1 = max(z.leg1.pfIsolationR04().sumChargedHadronPt-footPrintLeg1,0.0)                    
+        cleanedChargedIso2 = max(z.leg2.pfIsolationR04().sumChargedHadronPt-footPrintLeg2,0.0)                    
+        cleanedNeutralIsoDB1=max( z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-z.leg1.puChargedHadronIsoR(0.4)/2, 0.0)
+        cleanedNeutralIsoDB2=max( z.leg2.neutralHadronIsoR(0.4)+z.leg2.photonIsoR(0.4)-z.leg2.puChargedHadronIsoR(0.4)/2, 0.0)
+
+        return (cleanedChargedIso1+cleanedNeutralIsoDB1)/z.leg1.pt()<0.4 and (cleanedChargedIso2+cleanedNeutralIsoDB2)/z.leg2.pt()<0.4
 
 
 
-    def eIsolationFootPrint(self,z):
+    def WENuPFIsolation(self,z):
         footPrintChargedLeg1=0.0
         footPrintNeutralLeg1=0.0
 
         if not z.leg1.isPF():
-
             for i in range(0,z.leg1.associatedPackedPFCandidates().size()):
                 c=z.leg1.associatedPackedPFCandidates()[i]
                 dr = deltaR(z.leg1.eta(),z.leg1.phi(),c.eta(),c.phi())
@@ -76,11 +48,13 @@ class LeptonicVMaker( Analyzer ):
                     else:    
                         footPrintNeutralLeg1=footPrintNeutralLeg1+c.pt()
 
-        z.leg1.cleanedChargedIso = max(z.leg1.chargedHadronIsoR(0.4)-footPrintChargedLeg1,0.0)                    
-        z.leg1.cleanedNeutralIsoDB=max( z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-footPrintNeutralLeg1-z.leg1.puChargedHadronIsoR(0.4)/2, 0.0)
-        z.leg1.cleanedNeutralIsoRho=max(z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-footPrintNeutralLeg1-z.leg1.rho*z.leg1.EffectiveArea04,0)        
+        cleanedChargedIso = max(z.leg1.chargedHadronIsoR(0.4)-footPrintChargedLeg1,0.0)                    
+        cleanedNeutralIsoRho=max(z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-footPrintNeutralLeg1-z.leg1.rho*z.leg1.EffectiveArea04,0)        
+        return (cleanedChargedIso + cleanedNeutralIsoRho)/z.leg1.pt()<0.2
 
-    def eeIsolationFootPrint(self,z):
+
+
+    def ZEEPFIsolation(self,z):
         footPrintChargedLeg1=0.0
         footPrintChargedLeg2=0.0
         footPrintNeutralLeg1=0.0
@@ -120,12 +94,18 @@ class LeptonicVMaker( Analyzer ):
                         footPrintNeutralLeg1=footPrintNeutralLeg1+c.pt()
 
 
-        z.leg1.cleanedChargedIso = max(z.leg1.chargedHadronIsoR(0.4)-footPrintChargedLeg1,0.0)                    
-        z.leg2.cleanedChargedIso = max(z.leg1.chargedHadronIsoR(0.4)-footPrintChargedLeg2,0.0)                    
-        z.leg1.cleanedNeutralIsoDB=max( z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-footPrintNeutralLeg1-z.leg1.puChargedHadronIsoR(0.4)/2, 0.0)
-        z.leg1.cleanedNeutralIsoRho=max(z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-footPrintNeutralLeg1-z.leg1.rho*z.leg1.EffectiveArea04,0)        
-        z.leg2.cleanedNeutralIsoDB=max( z.leg2.neutralHadronIsoR(0.4)+z.leg2.photonIsoR(0.4)-footPrintNeutralLeg2-z.leg2.puChargedHadronIsoR(0.4)/2, 0.0)
-        z.leg2.cleanedNeutralIsoRho=max(z.leg2.neutralHadronIsoR(0.4)+z.leg2.photonIsoR(0.4)--footPrintNeutralLeg2-z.leg2.rho*z.leg2.EffectiveArea04,0)        
+        cleanedChargedIso1 = max(z.leg1.chargedHadronIsoR(0.4)-footPrintChargedLeg1,0.0)                    
+        cleanedChargedIso2 = max(z.leg1.chargedHadronIsoR(0.4)-footPrintChargedLeg2,0.0)                    
+        cleanedNeutralIsoRho1=max(z.leg1.neutralHadronIsoR(0.4)+z.leg1.photonIsoR(0.4)-footPrintNeutralLeg1-z.leg1.rho*z.leg1.EffectiveArea04,0)        
+        cleanedNeutralIsoRho2=max(z.leg2.neutralHadronIsoR(0.4)+z.leg2.photonIsoR(0.4)--footPrintNeutralLeg2-z.leg2.rho*z.leg2.EffectiveArea04,0)        
+
+        return (cleanedChargedIso1+cleanedNeutralIsoRho1)/z.leg1.pt()<0.4 and (cleanedChargedIso2+cleanedNeutralIsoRho2)/z.leg2.pt()<0.4
+
+    def ZIsolation(self,z):
+        if abs(z.leg1.pdgId())==11:
+            return self.ZEEPFIsolation(z)
+        else:
+            return self.ZMuMuPFIsolation(z)
 
 
     def simpleWKinematicFit(self,pair):
@@ -181,7 +161,7 @@ class LeptonicVMaker( Analyzer ):
     def defaultWKinematicFit(self,pair):
         MW=80.390
 
-        muLonLV = ROOT.TLorentzVector(pair.leg1.px(),pair.leg1.py(),pair.leg1.pz(),pair.leg1.energy())
+        muonLV = ROOT.TLorentzVector(pair.leg1.px(),pair.leg1.py(),pair.leg1.pz(),pair.leg1.energy())
         metLV = ROOT.TLorentzVector(pair.leg2.px(),pair.leg2.py(),pair.leg2.pz(),pair.leg2.energy())
 
 
@@ -216,60 +196,35 @@ class LeptonicVMaker( Analyzer ):
             pair.LV=pair.leg1.p4()+pp
             pair.alternateLV=pair.LV
 
-    def makeLeptonsMET(self,leptonList,MET):
+
+    def makeZ(self,leptonList):
+        output=[]
+        for l1,l2 in combinations(leptonList,2):
+            if  (l1.pdgId() == -l2.pdgId()):
+                pair = Pair(l1,l2,23)
+                m=pair.p4().mass()
+                isMU = abs(l1.pdgId())==13
+                if l1.pt()>l2.pt():
+                    leading=l1
+                    subleading=l2
+                else:
+                    leading=l2
+                    subleading=l1
+                if isMU:
+                    ID = (l1.highPtID and l2.highPtID) or (l1.highPtID and l2.highPtTrackID ) or (l2.highPtID and l1.highPtTrackID )
+                else:
+                    ID=True
+
+                if m>70.0 and m<110.0 and ID and self.ZIsolation(pair) and pair.p4().pt()>200.0 and ((isMU and leading.pt()>50 and abs(leading.eta())<2.1) or ((not isMU) and leading.pt()>115 )):
+                    output.append(pair)
+        return output            
+
+
+    def makeW(self,leptonList,MET):
         output=[]
         for l1 in leptonList:
             pair = Pair(l1,MET,l1.charge()*24)
-            mt=pair.mt()
-            if abs(l1.pdgId())==11:
-                self.eIsolationFootPrint(pair)
-            elif     abs(l1.pdgId())==13:
-                self.muIsolationFootPrint(pair)
-            if self.selectLNuPair(pair):
-#                self.defaultWKinematicFit(pair)
-                self.simpleWKinematicFit(pair)
+            self.simpleWKinematicFit(pair)
+            if  pair.pt()>200.0 and ((abs(l1.pdgId())==13 and MET.pt()>40) or (abs(l1.pdgId())==11 and MET.pt()>80)) :
                 output.append(pair)
         return output            
-
-    
-    def beginLoop(self, setup):
-        super(LeptonicVMaker,self).beginLoop(setup)
-        
-    def process(self, event):
-        self.readCollections( event.input )
-        
-
-        #make all first
-        event.allLL=self.makeDiLeptons(event.selectedLeptons)
-        event.LL = event.allLL
-        event.allLNu=self.makeLeptonsMET(event.selectedLeptons,event.met)
-        
-        
-        #now make Z first . for the remaining leptons after Z make W
-        leptons=copy(event.selectedLeptons)
-        used = []
-
-
-        for z in event.LL:
-            used.extend([z.leg1,z.leg2])
-
-        for u in used:
-#            print 'found used lepton',u.pt(),u.pdgId()
-            if u in leptons:
-                leptons.remove(u)
-#                print 'is in list,removed, is it in now?',(u in leptons)
-
-
-        event.LNu = self.makeLeptonsMET(leptons,event.met)
-        return True
-
-
-
-        
-            
-
-        
-
-
-                
-                

@@ -23,10 +23,6 @@ vvTreeProducer = cfg.Analyzer(
      defaultFloatType = 'F', # use Float_t for floating point
 #     PDFWeights = PDFWeights,
      globalVariables = [
-        NTupleVariable("nAllLNu",lambda ev: len(ev.allLNu) , int),       
-        NTupleVariable("nAllLL",lambda ev: len(ev.allLL) , int),       
-        NTupleVariable("nLL",lambda ev: len(ev.LL) , int),       
-        NTupleVariable("nLNu",lambda ev: len(ev.LNu) , int),       
         NTupleVariable("rho",  lambda ev: ev.rho, float, help="kt6PFJets rho"),
         NTupleVariable("rhoCN",  lambda ev: ev.rhoCN, float, help="fixed grid rho central neutral"),
         NTupleVariable("nVert",  lambda ev: len(ev.goodVertices), int, help="Number of good vertices"), 
