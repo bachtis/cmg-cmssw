@@ -15,7 +15,7 @@ class VVBuilder(Analyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(VVBuilder,self).__init__(cfg_ana, cfg_comp, looperName)
         self.vbTool = VectorBosonToolBox()
-
+        self.smearing=ROOT.TRandom(10101982)
 
     def copyLV(self,LV):
         out=[]
@@ -33,14 +33,19 @@ class VVBuilder(Analyzer):
 
         for i in range(0,jet.numberOfDaughters()):
             if jet.daughter(i).numberOfDaughters()==0:
-                if hasattr(self.cfg_ana,"doPUPPI") and self.cfg_ana.doPUPPI:
+                if jet.daughter(i).pt()>13000 or jet.daughter(i).pt()==float('Inf'):
+                    continue
+                if hasattr(self.cfg_ana,"doPUPPI") and self.cfg_ana.doPUPPI and jet.daughter(i).puppiWeight()>0.0:
+                    
                     LVs.push_back(jet.daughter(i).p4()*jet.daughter(i).puppiWeight())
                 else:
                     LVs.push_back(jet.daughter(i).p4())
             else:
                 for j in range(0,jet.daughter(i).numberOfDaughters()):
+                    if jet.daughter(i).daughter(j).pt()>13000 or jet.daughter(i).daughter(j).pt()==float('Inf'):
+                        continue
                     if jet.daughter(i).daughter(j).numberOfDaughters()==0:
-                        if hasattr(self.cfg_ana,"doPUPPI") and self.cfg_ana.doPUPPI:
+                        if hasattr(self.cfg_ana,"doPUPPI") and self.cfg_ana.doPUPPI and jet.daughter(i).daughter(j).puppiWeight()>0.0:
                             LVs.push_back(jet.daughter(i).daughter(j).p4()*jet.daughter(i).daughter(j).puppiWeight())
                         else:
                             LVs.push_back(jet.daughter(i).daughter(j).p4())
@@ -64,7 +69,12 @@ class VVBuilder(Analyzer):
 
         #Get pruned lorentzVector and subjets
         interface.prune(True,0,0.1,0.5)
+
+        
         jet.substructure.prunedJet = self.copyLV(interface.get(False))[0]*corrNoL1
+        jet.substructure.prunedJetUp = 1.05*jet.substructure.prunedJet.mass()
+        jet.substructure.prunedJetDown = 0.95*jet.substructure.prunedJet.mass()
+        jet.substructure.prunedJetSmear = jet.substructure.prunedJet.mass()*self.smearing.Gaus(1.0,1.1)
 
 
         interface.makeSubJets(False,0,2)
@@ -84,8 +94,13 @@ class VVBuilder(Analyzer):
 
         #Get soft Drop lorentzVector and subjets
 
+
         interface.softDrop(True,0,0.0,0.1,0.8)
         jet.substructure.softDropJet = self.copyLV(interface.get(False))[0]*corrNoL1
+        jet.substructure.softDropMassUp = 1.05*jet.substructure.softDropJet.mass()
+        jet.substructure.softDropJetDown = 0.95*jet.substructure.softDropJet.mass()
+        jet.substructure.softDropJetSmear = jet.substructure.softDropJet.mass()*self.smearing.Gaus(1.0,0.1)
+
         interface.makeSubJets(False,0,2)
         jet.substructure.softDropSubjets = self.copyLV(interface.get(False))        
 
@@ -95,8 +110,9 @@ class VVBuilder(Analyzer):
         
         #recluster with CA and do massdrop
 
-        interface = ROOT.cmg.FastJetInterface(LVs,0.0,0.8,1,0.01,5.0,4.4)
+        interface = ROOT.cmg.FastJetInterface(LVs,0.0,1.5,1,0.01,5.0,4.4)
         interface.makeInclusiveJets(150.0)
+
         mu= ROOT.Double(0.667)
         y= ROOT.Double(0.08)
         jet.substructure.massDropTag = interface.massDropTag(0,mu,y)
@@ -185,6 +201,8 @@ class VVBuilder(Analyzer):
         
         #substructure
         self.substructure(VV.leg2)
+        if not hasattr(VV.leg2,'substructure'):
+            return output
 
         #check if there are subjets
 
@@ -242,6 +260,9 @@ class VVBuilder(Analyzer):
         #substructure
         self.substructure(VV.leg2)
 
+        if not hasattr(VV.leg2,"substructure"):
+            return output
+
         #check if there are subjets
 
 #        if len(VV.leg2.substructure.prunedSubjets)<2:
@@ -296,6 +317,10 @@ class VVBuilder(Analyzer):
         #substructure
         self.substructure(VV.leg2)
 
+        if not hasattr(VV.leg2,"substructure"):
+            return output
+
+
         #check if there are subjets
 
  #       if len(VV.leg2.substructure.prunedSubjets)<2:
@@ -333,6 +358,12 @@ class VVBuilder(Analyzer):
         self.substructure(VV.leg2)
 
 
+        if not hasattr(VV.leg1,"substructure"):
+            return output
+
+        if not hasattr(VV.leg2,"substructure"):
+            return output
+
         #check if there are subjets
 
   #      if len(VV.leg2.substructure.prunedSubjets)<2 or len(VV.leg1.substructure.prunedSubjets)<2:
@@ -366,6 +397,8 @@ class VVBuilder(Analyzer):
 
         self.substructure(VV.leg2)
 
+        if not hasattr(VV.leg2,"substructure"):
+            return output
 
 
         #check if there are subjets

@@ -5,6 +5,48 @@
 ##########################################################
 
 
+#AAA
+###
+def autoAAA(selectedComponents,onlyRemote=False,forceAAA=False):
+    newComp=[]
+    import re
+    from CMGTools.Production import changeComponentAccessMode
+    from CMGTools.Production.localityChecker import LocalityChecker
+    tier2Checker = LocalityChecker("T2_CH_CERN", datasets="/*/*/MINIAOD*")
+    for comp in selectedComponents:
+        if len(comp.files)==0:
+            continue
+        if not hasattr(comp,'dataset'): continue
+        if not re.match("/[^/]+/[^/]+/MINIAOD(SIM)?", comp.dataset): continue
+        if "/store/" not in comp.files[0]: continue
+        if re.search("/store/(group|user|cmst3)/", comp.files[0]): continue
+        if (not tier2Checker.available(comp.dataset)) or forceAAA:
+            print "Dataset %s is not available, will use AAA" % comp.dataset
+            changeComponentAccessMode.convertComponent(comp, "root://cms-xrd-global.cern.ch/%s")
+            newComp.append(comp)
+    if onlyRemote:
+        return newComp
+    else:
+        return selectedComponents
+
+def autoConfig(selectedComponents,sequence,services=[],xrd_aggressive=2):
+    import PhysicsTools.HeppyCore.framework.config as cfg
+    from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
+    from CMGTools.TTHAnalysis.tools.EOSEventsWithDownload import EOSEventsWithDownload
+    event_class = EOSEventsWithDownload
+    EOSEventsWithDownload.aggressive = xrd_aggressive 
+    if getHeppyOption("nofetch") or getHeppyOption("isCrab"):
+        event_class = Events
+    return cfg.Config( components = selectedComponents,
+                     sequence = sequence,
+                     services = services,  
+                     events_class = event_class)
+
+
+###
+
+
+
 import CMGTools.RootTools.fwlite.Config as cfg
 from CMGTools.RootTools.fwlite.Config import printComps
 from CMGTools.RootTools.RootTools import *
@@ -16,8 +58,8 @@ from CMGTools.VVResonances.analyzers.core_cff import *
 #-------- SAMPLES AND TRIGGERS -----------
 from CMGTools.VVResonances.samples.loadSamples import *
 
-selectedComponents = mcSamples+dataSamples
-#selectedComponents = dataSamples
+selectedComponents = mcSamples
+
 
 
 #import pdb;pdb.set_trace()
@@ -47,7 +89,7 @@ triggerFlagsAna.triggerBits ={
 
 
 #-------- HOW TO RUN
-test = 4
+test = 2
 if test==1:
     # test a single component, using a single thread.
     selectedComponents = [VBF_RadionToZZ_narrow_4500]
@@ -72,12 +114,8 @@ elif test==4:
     for comp in selectedComponents:
         comp.splitFactor = 1
 elif test==5:    
-    selectedComponents = [WJetsToLNu_HT2500toInf]
+    selectedComponents = [WJetsToLNu_HT2500toInf,VBF_RadionToZZ_narrow_4500,RSGravToWWToLNQQ_kMpl01_4500]
 
-from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
-event_class = Events
-config = cfg.Config( components = selectedComponents,
-                     sequence = sequence,
-                     services = [],  
-                     events_class = event_class)
 
+selectedComponents=autoAAA(selectedComponents)
+config=autoConfig(selectedComponents,sequence)

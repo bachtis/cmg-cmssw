@@ -165,37 +165,40 @@ class VectorBosonToolBox(object):
         metLV = ROOT.TLorentzVector(pair.leg2.px(),pair.leg2.py(),pair.leg2.pz(),pair.leg2.energy())
 
 
+        MET2 = metLV.Pt()*metLV.Pt()
+        R = (0.5*(MW*MW+muonLV.Px()*metLV.Px()+muonLV.Py()*metLV.Py()))/muonLV.E();
 
-        alpha = MW*MW+2*muonLV.Px()*metLV.Px()+2*muonLV.Py()*metLV.Py()
-        A = 4*(muonLV.Energy()*muonLV.Energy()-muonLV.Pz()*muonLV.Pz()) 
-        B = -4* alpha*muonLV.Pz()
-        C = 4*muonLV.Energy()*muonLV.Energy()*(metLV.Px()*metLV.Px()+metLV.Py()*metLV.Py())-alpha*alpha
-        D = B*B-4*A*C
+        A = (muonLV.Pz()*muonLV.Pz())/(muonLV.P()*muonLV.P())-1;
+        B = 2*R*muonLV.Pz()/muonLV.P();
+        C = R*R-metLV.Pt()*metLV.Pt();
+
+        D = B*B-4*A*C;
+
 
         if D>0:
             pz1=(-B+math.sqrt(D))/(2*A)
             pz2=(-B-math.sqrt(D))/(2*A)
             if abs(pz1)<abs(pz2):
                 pp1 =pair.leg2.p4()
-                pp1.SetPxPyPzE(metLV.Px(),metLV.Py(),pz1,metLV.Energy())
+                pp1.SetPxPyPzE(metLV.Px(),metLV.Py(),pz1,math.sqrt(MET2+pz1*pz1))
                 pair.LV=pair.leg1.p4()+pp1
                 pp2 =pair.leg2.p4()
-                pp2.SetPxPyPzE(metLV.Px(),metLV.Py(),pz2,metLV.Energy())
+                pp2.SetPxPyPzE(metLV.Px(),metLV.Py(),pz2,math.sqrt(MET2+pz2*pz2))
                 pair.alternateLV=pair.leg1.p4()+pp2
             else:    
-                pp1 =pair.leg2.p4()
-                pp1.SetPxPyPzE(metLV.Px(),metLV.Py(),pz2,metLV.Energy())
-                pair.LV=pair.leg1.p4()+pp1
                 pp2 =pair.leg2.p4()
-                pp2.SetPxPyPzE(metLV.Px(),metLV.Py(),pz1,metLV.Energy())
+                pp2.SetPxPyPzE(metLV.Px(),metLV.Py(),pz1,math.sqrt(MET2+pz1*pz1))
                 pair.alternateLV=pair.leg1.p4()+pp2
+                pp1 =pair.leg2.p4()
+                pp1.SetPxPyPzE(metLV.Px(),metLV.Py(),pz2,math.sqrt(MET2+pz2*pz2))
+                pair.LV=pair.leg1.p4()+pp1
+
         else:
             pz=-B/(2*A)
             pp =pair.leg2.p4()
-            pp.SetPxPyPzE(metLV.Px(),metLV.Py(),pz,metLV.Energy())
+            pp.SetPxPyPzE(metLV.Px(),metLV.Py(),pz,math.sqrt(MET2+pz*pz))
             pair.LV=pair.leg1.p4()+pp
             pair.alternateLV=pair.LV
-
 
     def makeZ(self,leptonList):
         output=[]
@@ -224,7 +227,7 @@ class VectorBosonToolBox(object):
         output=[]
         for l1 in leptonList:
             pair = Pair(l1,MET,l1.charge()*24)
-            self.simpleWKinematicFit(pair)
+            self.defaultWKinematicFit(pair)
             if  pair.pt()>200.0 and ((abs(l1.pdgId())==13 and MET.pt()>40) or (abs(l1.pdgId())==11 and MET.pt()>80)) :
                 output.append(pair)
         return output            

@@ -5,6 +5,7 @@ from PhysicsTools.Heppy.analyzers.gen.all import *
 from CMGTools.VVResonances.analyzers.LeptonIDOverloader import *
 from CMGTools.VVResonances.analyzers.VVBuilder import *
 from CMGTools.VVResonances.analyzers.Skimmer import *
+from CMGTools.VVResonances.analyzers.HBHENoiseFix import *
 import os
 
 
@@ -40,6 +41,12 @@ triggerFlagsAna = cfg.Analyzer(
     triggerBits = {
     }
     )
+
+
+#Fix HBHE
+hbheFix = cfg.Analyzer(
+HBHENoiseFix,name ='hbheNoiseFix'
+)
 
 
 # Create flags for MET filter bits
@@ -317,6 +324,7 @@ coreSequence = [
 #    tauAna,
 #    packedAna,
 #    multiStateAna,
-#    eventFlagsAna,
-#    triggerFlagsAna    
+    eventFlagsAna,
+    hbheFix,
+    triggerFlagsAna    
 ]
